@@ -1,0 +1,29 @@
+.tlContainer {
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.tlHeader {
+    display: flex;
+    justify-content: space-between;
+    background-color: #eee;
+}
+.tlHeader,
+.tlBody,
+.tlAction {
+    padding: 10px;
+}
+.tlHeader h2 {
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.tlBody textarea {
+    resize: none;
+    border-color: #eee;
+}
+.tlAction {
+    display: flex;
+    justify-content: space-between;
+}
