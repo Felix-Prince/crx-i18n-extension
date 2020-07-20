@@ -1,13 +1,21 @@
 {
-    "name": "i18nExtension",
-    "version": "1.0",
-    "manifest_version": 2,
-    "description": "用于项目中处理 i18n",
-    "browser_action": {
-        "default_title": "i18nExtension",
-        "default_popup": "index.html"
-    },
-    "background": {
-        "scripts": ["background.js"]
-    }
+	"name": "i18nExtension",
+	"version": "1.0",
+	"manifest_version": 2,
+	"description": "用于项目中处理 i18n",
+	"browser_action": {
+		"default_title": "i18nExtension",
+		"default_popup": "index.html"
+	},
+	"background": {
+		"scripts": ["md5.min.js", "tjs.browser.js", "background.js"]
+	},
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["content-scripts/index.js"],
+			"run_at": "document_start"
+		}
+	],
+	"permissions": ["<all_urls>"]
 }

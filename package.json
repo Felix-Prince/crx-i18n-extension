@@ -7,12 +7,10 @@
         "@testing-library/react": "^9.3.2",
         "@testing-library/user-event": "^7.1.2",
         "antd": "3.26.16",
-        "axios": "^0.19.2",
-        "chrome-call": "^4.0.1",
-        "google-translate-api": "^2.3.0",
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
-        "react-scripts": "3.4.1"
+        "react-scripts": "3.4.1",
+        "translation.js": "^0.7.15"
     },
     "scripts": {
         "start": "react-scripts start",
@@ -20,7 +18,7 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "copy": "cp src/background.js build/background.js && cp -r src/content-scripts build/content-scripts && cp -r src/popup build/popup",
-        "build-chrome-ext": "npm run build && npm run copy"
+        "build-crx": "npm run build && npm run copy"
     },
     "eslintConfig": {
         "extends": "react-app"

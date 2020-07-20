@@ -1,14 +1,14 @@
-translationHandle = async () => {
-    const { sourceContent } = this.state;
-    const res = await axios.get(
-        "http://translate.google.cn/translate_a/single",
-        {
-            client: "gtx",
-            sl: "auto",
-            tl: "zh-CN",
-            dt: "t",
-            q: sourceContent,
-        }
-    );
-    console.log("---", res);
-};
+function translationHandle(content) {
+	const { youdao, baidu, google } = window.tjs;
+	google.translate(content).then((result) => {
+		var views = chrome.extension.getViews({ type: "popup" });
+		if (views.length > 0) {
+			views[0].document.getElementById("targetContent").innerText =
+				result.result[0];
+		}
+	});
+}
+
+function test(params) {
+	console.log("+++", params);
+}
