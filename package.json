@@ -1,38 +1,40 @@
 {
-    "name": "crx-i18n-extension",
-    "version": "0.1.0",
-    "private": true,
-    "dependencies": {
-        "@testing-library/jest-dom": "^4.2.4",
-        "@testing-library/react": "^9.3.2",
-        "@testing-library/user-event": "^7.1.2",
-        "antd": "3.26.16",
-        "react": "^16.13.1",
-        "react-dom": "^16.13.1",
-        "react-scripts": "3.4.1",
-        "translation.js": "^0.7.15"
-    },
-    "scripts": {
-        "start": "react-scripts start",
-        "build": "INLINE_RUNTIME_CHUNK=false react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject",
-        "copy": "cp src/background.js build/background.js && cp -r src/content-scripts build/content-scripts && cp -r src/popup build/popup",
-        "build-crx": "npm run build && npm run copy"
-    },
-    "eslintConfig": {
-        "extends": "react-app"
-    },
-    "browserslist": {
-        "production": [
-            ">0.2%",
-            "not dead",
-            "not op_mini all"
-        ],
-        "development": [
-            "last 1 chrome version",
-            "last 1 firefox version",
-            "last 1 safari version"
-        ]
-    }
+	"name": "crx-i18n-extension",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@testing-library/jest-dom": "^4.2.4",
+		"@testing-library/react": "^9.3.2",
+		"@testing-library/user-event": "^7.1.2",
+		"antd": "3.26.16",
+		"js-yaml": "^3.14.0",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1",
+		"react-scripts": "3.4.1",
+		"translation.js": "^0.7.15"
+	},
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "INLINE_RUNTIME_CHUNK=false react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject",
+		"copy": "cp src/background.js build/background.js && cp -r src/content-scripts build/content-scripts && cp -r src/popup build/popup",
+		"server": "node src/server",
+		"build-crx": "npm run build && npm run copy"
+	},
+	"eslintConfig": {
+		"extends": "react-app"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	}
 }

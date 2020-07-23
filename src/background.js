@@ -1,3 +1,4 @@
+var selector = null
 function translationHandle(content) {
 	const { youdao, baidu, google } = window.tjs;
 	google.translate(content).then((result) => {
@@ -9,6 +10,7 @@ function translationHandle(content) {
 	});
 }
 
-function test(params) {
-	console.log("+++", params);
-}
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+	selector = request.selection
+	console.log("selector",selector)
+});
