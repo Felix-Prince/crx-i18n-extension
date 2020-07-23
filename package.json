@@ -8,6 +8,7 @@
 		"@testing-library/user-event": "^7.1.2",
 		"antd": "3.26.16",
 		"js-yaml": "^3.14.0",
+		"lodash": "^4.17.19",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
 		"react-scripts": "3.4.1",

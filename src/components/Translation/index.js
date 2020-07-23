@@ -8,6 +8,7 @@ import {
 	setStorage,
 	getStorage,
 	exportFile,
+	clearStorage,
 } from "../../popup/index";
 import jsyaml from "js-yaml";
 
@@ -23,9 +24,14 @@ export default class Translation extends Component {
 
 	componentDidMount() {
 		if (selectedElement() && selectedElement().text) {
-			getStorage(selectedElement().dataKey, this.handleChange, () => {
-				translation(selectedElement().text, this.handleChange);
-			});
+			getStorage(
+				selectedElement().text,
+				selectedElement().dataKey,
+				this.handleChange,
+				() => {
+					translation(selectedElement().text, this.handleChange);
+				}
+			);
 			this.setState({
 				sourceContent: selectedElement().text,
 				dataKey: selectedElement().dataKey,
@@ -35,17 +41,23 @@ export default class Translation extends Component {
 
 	exportYaml = () => {
 		exportFile((data) => {
-			const blob = new Blob([jsyaml.dump(data)], {
+			const blob = new Blob([jsyaml.dump(data["zh-CN"])], {
 				type: "application/x-yaml",
 			});
 			saveAs(blob, "file.yaml");
 		});
 	};
 
+	checkImport = () => {
+		exportFile((data) => {
+			console.log("check", data);
+		});
+	};
+
 	saveEdit = () => {
 		const { targetContent, dataKey } = this.state;
 		if (dataKey) {
-			setStorage({ [dataKey]: targetContent });
+			setStorage("zh-CN", { [dataKey]: targetContent });
 		}
 	};
 
@@ -53,7 +65,7 @@ export default class Translation extends Component {
 		this.setState({
 			[type]: value,
 		});
-		// type === "sourceContent" && translation(e.target.value);
+		type === "sourceContent" && translation(value);
 	};
 
 	render() {
@@ -75,7 +87,7 @@ export default class Translation extends Component {
 					reader.onload = function (e) {
 						var yaml = e.target.result;
 						let jsonData = jsyaml.load(yaml);
-						setStorage(jsonData);
+						setStorage("zh-CN", jsonData);
 					};
 				} else if (info.file.status === "error") {
 					console.log(`${info.file.name} file upload failed.`);
@@ -87,6 +99,8 @@ export default class Translation extends Component {
 			<div className={styles.tlContainer}>
 				<div className={styles.tlHeader}>
 					<h2>翻译</h2>
+					<Button onClick={() => clearStorage()}>清空缓存</Button>
+					<Button onClick={this.checkImport}>查看导入</Button>
 					{/* <Select defaultValue="lucy" style={{ width: 120 }}>
                         <Option value="jack">Jack</Option>
                         <Option value="lucy">Lucy</Option>
@@ -118,18 +132,22 @@ export default class Translation extends Component {
 							id="targetContent"
 							value={targetContent}
 							onChange={(e) =>
-								this.setState({ targetContent: e.target.value })
+								this.handleChange(
+									e.target.value,
+									"targetContent"
+								)
 							}
 						/>
 					</div>
+					{/* 这里还有一个用处， 没有这个 targetContent 的输入会有问题 */}
 					<div className={styles.chooseYaml}>
-						<Select size="small" defaultValue="lucy" style={{ width: 120 }}>
-							<Option value="jack">Jack</Option>
-							<Option value="lucy">Lucy</Option>
-							<Option value="disabled" disabled>
-								Disabled
-							</Option>
-							<Option value="Yiminghe">yiminghe</Option>
+						<Select
+							size="small"
+							placeholder="请选择导出的语言包"
+							style={{ width: 280 }}
+						>
+							<Option value="zh-CN">中文</Option>
+							<Option value="en">英文</Option>
 						</Select>
 					</div>
 				</div>

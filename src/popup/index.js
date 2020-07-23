@@ -1,4 +1,6 @@
 /*global chrome*/
+import { youdao, baidu, google } from "translation.js";
+import _ from "lodash";
 const background = chrome.extension.getBackgroundPage();
 
 export function translation(params, callback) {
@@ -9,27 +11,41 @@ export function selectedElement() {
 	return background.selector;
 }
 
-export function setStorage(data) {
-	chrome.storage.local.set(data, function () {
-		console.log("保存成功！");
-		chrome.storage.local.get(items => {
-			console.log("items",items)
-		});
+export function setStorage(lang, data) {
+	chrome.storage.local.get({ [lang]: "" }, (items) => {
+		const allData = items[lang];
+		console.log("alldata", items[lang]);
+		chrome.storage.local.set(
+			{ "zh-CN": _.merge(allData, data) },
+			function () {
+				console.log("保存成功！");
+				chrome.storage.local.get((items) => {
+					console.log("setSroage", items);
+				});
+			}
+		);
 	});
 }
 
-export function getStorage(key, SuccessCallback, FailCallback) {
-	chrome.storage.local.get({ [key]: "" }, function (items) {
-		console.log("items", items);
-		if (items[key]) {
-			SuccessCallback && SuccessCallback(items[key], "targetContent");
-			// document.getElementById("targetContent").value = items[key];
-		} else {
-			FailCallback && FailCallback();
-		}
+export function getStorage(text, key, SuccessCallback, FailCallback) {
+	google.detect(text).then((lang) => {
+		console.log("lang", lang); // => 'en'
+		chrome.storage.local.get({ [lang]: "" }, function (items) {
+			if (!_.isEmpty(items) && !_.isEmpty(items[lang])) {
+				SuccessCallback &&
+					SuccessCallback(items[lang][key], "targetContent");
+				// document.getElementById("targetContent").value = items[key];
+			} else {
+				FailCallback && FailCallback();
+			}
+		});
 	});
 }
 
 export function exportFile(callback) {
 	chrome.storage.local.get(callback);
+}
+
+export function clearStorage() {
+	chrome.storage.local.clear();
 }
