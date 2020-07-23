@@ -18,49 +18,42 @@ export default class Translation extends Component {
 	state = {
 		sourceContent: "",
 		targetContent: "",
+		dataKey: "",
 	};
 
 	componentDidMount() {
 		if (selectedElement() && selectedElement().text) {
-			getStorage(selectedElement().dataKey, () => {
-				translation(selectedElement().text);
+			getStorage(selectedElement().dataKey, this.handleChange, () => {
+				translation(selectedElement().text, this.handleChange);
 			});
-			// if (localStorage.getItem("data")) {
-			// 	const data = JSON.parse(localStorage.getItem("data"));
-			// 	const dataKey = selectedElement().dataKey;
-			// 	if (data[dataKey]) {
-			// 		this.setState({
-			// 			targetContent: data[dataKey],
-			// 		});
-			// 	} else {
-			// 		translation(selectedElement().text);
-			// 	}
-			// } else {
-			// 	translation(selectedElement().text);
-			// }
 			this.setState({
 				sourceContent: selectedElement().text,
+				dataKey: selectedElement().dataKey,
 			});
 		}
 	}
 
 	exportYaml = () => {
 		exportFile((data) => {
-			const blob = new Blob([jsyaml.dump(data)], { type: "application/x-yaml" });
+			const blob = new Blob([jsyaml.dump(data)], {
+				type: "application/x-yaml",
+			});
 			saveAs(blob, "file.yaml");
 		});
 	};
 
-	translationHandle = async () => {
-		const { sourceContent } = this.state;
-		translation(sourceContent);
+	saveEdit = () => {
+		const { targetContent, dataKey } = this.state;
+		if (dataKey) {
+			setStorage({ [dataKey]: targetContent });
+		}
 	};
 
-	handleChange = (e, type) => {
+	handleChange = (value, type) => {
 		this.setState({
-			[type]: e.target.value,
+			[type]: value,
 		});
-		translation(e.target.value);
+		// type === "sourceContent" && translation(e.target.value);
 	};
 
 	render() {
@@ -82,9 +75,7 @@ export default class Translation extends Component {
 					reader.onload = function (e) {
 						var yaml = e.target.result;
 						let jsonData = jsyaml.load(yaml);
-						// let jsonData = JSON.stringify(jsyaml.load(yaml));
 						setStorage(jsonData);
-						// localStorage.setItem("data", jsonData);
 					};
 				} else if (info.file.status === "error") {
 					console.log(`${info.file.name} file upload failed.`);
@@ -113,7 +104,10 @@ export default class Translation extends Component {
 							value={sourceContent}
 							placeholder="输入要翻译的单词或句子"
 							onChange={(e) =>
-								this.handleChange(e, "sourceContent")
+								this.handleChange(
+									e.target.value,
+									"sourceContent"
+								)
 							}
 						/>
 					</div>
@@ -121,10 +115,22 @@ export default class Translation extends Component {
 					<div className={styles.targetContent}>
 						<TextArea
 							rows={4}
-							disabled
 							id="targetContent"
 							value={targetContent}
+							onChange={(e) =>
+								this.setState({ targetContent: e.target.value })
+							}
 						/>
+					</div>
+					<div className={styles.chooseYaml}>
+						<Select size="small" defaultValue="lucy" style={{ width: 120 }}>
+							<Option value="jack">Jack</Option>
+							<Option value="lucy">Lucy</Option>
+							<Option value="disabled" disabled>
+								Disabled
+							</Option>
+							<Option value="Yiminghe">yiminghe</Option>
+						</Select>
 					</div>
 				</div>
 				<div className={styles.tlAction}>
@@ -138,7 +144,7 @@ export default class Translation extends Component {
 						<Icon type="export" />
 						导出
 					</Button>
-					<Button onClick={this.translationHandle}>
+					<Button onClick={this.saveEdit}>
 						<Icon type="save" />
 						保存
 					</Button>

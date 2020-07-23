@@ -1,12 +1,12 @@
 document.addEventListener("mouseup", function (e) {
-    const selectot = window.getSelection()
+	const selectot = window.getSelection();
 	if (selectot.toString()) {
-		console.log("widnow",selectot.focusNode.parentNode.tagName)
 		chrome.runtime.sendMessage({
+			cmd: "selection",
 			selection: {
 				text: selectot.toString(),
-                tagName: selectot.focusNode.parentNode.tagName,
-                dataKey:selectot.focusNode.parentNode.getAttribute('data-key')
+				tagName: selectot.focusNode.parentNode.tagName,
+				dataKey: selectot.focusNode.parentNode.getAttribute("data-key"),
 			},
 		});
 	}

@@ -1,29 +1,35 @@
 .tlContainer {
-    width: 300px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    overflow: hidden;
+	width: 300px;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	overflow: hidden;
 }
 .tlHeader {
-    display: flex;
-    justify-content: space-between;
-    background-color: #eee;
+	display: flex;
+	justify-content: space-between;
+	background-color: #eee;
 }
 .tlHeader,
 .tlBody,
 .tlAction {
-    padding: 10px;
+	padding: 10px;
 }
 .tlHeader h2 {
-    font-size: 18px;
-    font-weight: normal;
+	font-size: 18px;
+	font-weight: normal;
 }
 
 .tlBody textarea {
-    resize: none;
-    border-color: #eee;
+	width: 100%;
+	resize: none;
+	border-color: #eee;
 }
+
+.chooseYaml {
+    padding: 10px 0;
+}
+
 .tlAction {
-    display: flex;
-    justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 }

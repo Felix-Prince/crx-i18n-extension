@@ -7,74 +7,11 @@
 	</head>
 	<body>
 		<div>
-			<custom-elm data-key="noticeGroup">新增</custom-elm>
+			<custom-elm data-key="noticeGroup">通知组</custom-elm>
+			<br />
 			<custom-elm data-key="xssaa">delete</custom-elm>
-			<input type="file" name="" id="input" />
-			<button id="btn">写入</button>
+			<!-- <input type="file" name="" id="input" />
+			<button id="btn">写入</button> -->
 		</div>
-        <script src="./FileSaver.js"></script>
-        <script src="./js-yaml.min.js"></script>
-		<script>
-			const inputElement = document.getElementById("input");
-			let reader = new FileReader();
-
-			inputElement.addEventListener("change", handleFiles, false);
-
-			function handleFiles() {
-				const fileList = this.files;
-				reader.readAsText(fileList[0], "utf-8");
-				console.log(fileList)
-				reader.onload = function (e) {
-					// urlData就是对应的文件内容
-                    var yaml = this.result;
-                    // let json = JSON.stringify(jsyaml.load(yaml))
-                    console.log(yaml)
-                    // const obj = {
-                    //     name:'zs',
-                    //     age:18,
-                    //     address:'zhejiang shanghai'
-                    // }
-                    // console.log(jsyaml.dump(JSON.parse(json)))
-					// console.log("urlData", urlData);
-				};
-			}
-
-			// document.getElementById("btn").onclick = function () {
-			// 	var blog = new Blob(["xushss"], { type: "text/plain" });
-			// 	saveAs(blog, "log.txt");
-			// };
-
-			window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-
-			function onInitFs(fs) {
-				fs.root.getFile(
-					"log.txt",
-					{},
-					function (fileEntry) {
-						// Get a File object representing the file,
-						// then use FileReader to read its contents.
-						fileEntry.file(function (file) {
-							var reader = new FileReader();
-
-							reader.onloadend = function (e) {
-								var txtArea = document.createElement(
-									"textarea"
-								);
-								txtArea.value = this.result;
-								document.body.appendChild(txtArea);
-							};
-
-							reader.readAsText(file);
-						});
-					}
-				);
-			}
-
-			window.requestFileSystem(
-				window.TEMPORARY,
-				1024 * 1024,
-				onInitFs
-			);
-		</script>
 	</body>
 </html>
