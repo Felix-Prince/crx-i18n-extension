@@ -29,7 +29,9 @@ export default class Translation extends Component {
 				selectedElement().dataKey,
 				this.handleChange,
 				() => {
-					translation(selectedElement().text, this.handleChange);
+					translation(selectedElement().text, (result) =>
+						this.handleChange(result, "targetContent")
+					);
 				}
 			);
 			this.setState({
@@ -65,7 +67,10 @@ export default class Translation extends Component {
 		this.setState({
 			[type]: value,
 		});
-		type === "sourceContent" && translation(value);
+		type === "sourceContent" &&
+			translation(value, (result) =>
+				this.handleChange(result, "targetContent")
+			);
 	};
 
 	render() {

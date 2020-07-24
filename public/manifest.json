@@ -14,7 +14,8 @@
 		{
 			"matches": ["<all_urls>"],
 			"js": ["content-scripts/index.js"],
-			"run_at": "document_start"
+			"css": ["content-scripts/template.css"],
+			"run_at": "document_end"
 		}
 	],
 	"permissions": ["<all_urls>", "tabs", "storage"]

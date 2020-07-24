@@ -3,11 +3,17 @@ import { youdao, baidu, google } from "translation.js";
 import _ from "lodash";
 const background = chrome.extension.getBackgroundPage();
 
-export function translation(params, callback) {
-	background.translationHandle(params, callback); // 访问bg的函数
+export async function translation(params, callback) {
+	const result = await background.translationHandle(params); // 访问bg的函数
+	var views = chrome.extension.getViews({ type: "popup" });
+	if (views.length > 0) {
+		console.log("translation", result);
+		callback && callback(result.result[0]);
+	}
 }
 
 export function selectedElement() {
+	console.log("selectedElement", background.selector);
 	return background.selector;
 }
 

@@ -1,0 +1,33 @@
+.crx_extension_hide {
+    display: none;
+}
+.Translation_tlContainer__2Jt2_ {
+	width: 300px;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	overflow: hidden;
+}
+.Translation_tlContainer__2Jt2_ h2{
+    padding: 0;
+    margin: 0;
+}
+
+.Translation_tlHeader__29IRr {
+	display: flex;
+	justify-content: space-between;
+	background-color: #eee;
+}
+
+.Translation_tlBody__1SOcI,
+.Translation_tlHeader__29IRr {
+	padding: 10px;
+}
+.Translation_tlHeader__29IRr h2 {
+	font-size: 18px;
+	font-weight: 400;
+}
+.Translation_tlBody__1SOcI textarea {
+	width: 100%;
+	resize: none;
+	border-color: #eee;
+}
