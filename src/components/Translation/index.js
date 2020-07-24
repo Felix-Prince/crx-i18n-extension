@@ -24,16 +24,23 @@ export default class Translation extends Component {
 
 	componentDidMount() {
 		if (selectedElement() && selectedElement().text) {
-			getStorage(
+			translation(
 				selectedElement().text,
 				selectedElement().dataKey,
-				this.handleChange,
-				() => {
-					translation(selectedElement().text, (result) =>
-						this.handleChange(result, "targetContent")
-					);
-				}
+				(result) => this.handleChange(result, "targetContent")
 			);
+			// getStorage(
+			// 	selectedElement().text,
+			// 	selectedElement().dataKey,
+			// 	this.handleChange,
+			// 	() => {
+			// 		translation(
+			// 			selectedElement().text,
+			// 			selectedElement().dataKey,
+			// 			(result) => this.handleChange(result, "targetContent")
+			// 		);
+			// 	}
+			// );
 			this.setState({
 				sourceContent: selectedElement().text,
 				dataKey: selectedElement().dataKey,
@@ -68,7 +75,7 @@ export default class Translation extends Component {
 			[type]: value,
 		});
 		type === "sourceContent" &&
-			translation(value, (result) =>
+			translation(value, this.state.dataKey, (result) =>
 				this.handleChange(result, "targetContent")
 			);
 	};
