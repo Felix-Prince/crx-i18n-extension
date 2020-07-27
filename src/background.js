@@ -24,15 +24,21 @@ function translationFromYaml(lang, key) {
 	});
 }
 
-// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-// 	if (request.cmd === "selection") {
-// 		selector = request.selection;
-// 		console.log("selector", selector);
-// 		translationHandle(selector.text, (result) => {
-// 			sendResponse({ translateValue: result });
-// 		});
-// 	}
-// });
+function setStorage(lang, data) {
+	chrome.storage.local.get({ [lang]: "" }, (items) => {
+		const allData = items[lang];
+		console.log("alldata", items[lang]);
+		chrome.storage.local.set(
+			{ "zh-CN": { ...allData, ...data } },
+			function () {
+				console.log("保存成功！");
+				chrome.storage.local.get((items) => {
+					console.log("setSroage", items);
+				});
+			}
+		);
+	});
+}
 
 chrome.runtime.onConnect.addListener(function (port) {
 	port.onMessage.addListener(async function (msg) {
@@ -43,6 +49,9 @@ chrome.runtime.onConnect.addListener(function (port) {
 				selector.dataKey
 			);
 			port.postMessage(result);
+		} else if (msg.cmd === "saveEdit") {
+			const { value, dataKey } = msg;
+			setStorage("zh-CN", { [dataKey]: value });
 		}
 	});
 });

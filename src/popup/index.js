@@ -17,19 +17,20 @@ export function selectedElement() {
 }
 
 export function setStorage(lang, data) {
-	chrome.storage.local.get({ [lang]: "" }, (items) => {
-		const allData = items[lang];
-		console.log("alldata", items[lang]);
-		chrome.storage.local.set(
-			{ "zh-CN": _.merge(allData, data) },
-			function () {
-				console.log("保存成功！");
-				chrome.storage.local.get((items) => {
-					console.log("setSroage", items);
-				});
-			}
-		);
-	});
+	background.setStorage(lang, data);
+	// chrome.storage.local.get({ [lang]: "" }, (items) => {
+	// 	const allData = items[lang];
+	// 	console.log("alldata", items[lang]);
+	// 	chrome.storage.local.set(
+	// 		{ "zh-CN": _.merge(allData, data) },
+	// 		function () {
+	// 			console.log("保存成功！");
+	// 			chrome.storage.local.get((items) => {
+	// 				console.log("setSroage", items);
+	// 			});
+	// 		}
+	// 	);
+	// });
 }
 
 export function getStorage(text, key, SuccessCallback, FailCallback) {
