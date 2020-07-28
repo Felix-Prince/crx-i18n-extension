@@ -5,6 +5,7 @@ const background = chrome.extension.getBackgroundPage();
 
 export async function translation(content, key, callback) {
 	const result = await background.translationHandle(content, key); // 访问bg的函数
+	console.log("popup",result)
 	var views = chrome.extension.getViews({ type: "popup" });
 	if (views.length > 0) {
 		callback && callback(result);

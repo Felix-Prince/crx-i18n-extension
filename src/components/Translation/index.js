@@ -24,6 +24,7 @@ export default class Translation extends Component {
 
 	componentDidMount() {
 		if (selectedElement() && selectedElement().text) {
+			console.log("selectElement",selectedElement())
 			translation(
 				selectedElement().text,
 				selectedElement().dataKey,

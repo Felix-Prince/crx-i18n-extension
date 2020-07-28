@@ -8,7 +8,6 @@ objImg.style.cursor = "pointer";
 document.body.appendChild(objImg);
 
 // var selector = null;
-var dataKey = "";
 var isShowBox = false;
 
 function createPanel() {
@@ -71,22 +70,25 @@ document.addEventListener("mouseup", function (ev) {
 		}
 	}, 200);
 
-	if (selector.toString()) {
+	if (selector.toString().trim()) {
+		chrome.storage.sync.get({ dataKey: "data-key" }, function (items) {
+			const dataKey = selector.focusNode.parentNode.getAttribute(
+				items.dataKey || "data-key"
+			);
 
-		dataKey = selector.focusNode.parentNode.getAttribute("data-key");
+			var port = chrome.runtime.connect();
+			port.postMessage({
+				cmd: "selection",
+				selection: {
+					text: selector.toString(),
+					tagName: selector.focusNode.parentNode.tagName,
+					dataKey,
+				},
+			});
 
-		var port = chrome.runtime.connect();
-		port.postMessage({
-			cmd: "selection",
-			selection: {
-				text: selector.toString(),
-				tagName: selector.focusNode.parentNode.tagName,
-				dataKey,
-			},
-		});
-
-		port.onMessage.addListener(function (msg) {
-			document.getElementById("targetContent").innerText = msg;
+			port.onMessage.addListener(function (msg) {
+				document.getElementById("targetContent").innerText = msg;
+			});
 		});
 	}
 });
@@ -116,10 +118,15 @@ document.addEventListener("click", function (ev) {
 
 document.getElementById("btnSaveEdit").addEventListener("click", function (e) {
 	e.stopPropagation();
-	var port = chrome.runtime.connect();
-	port.postMessage({
-		cmd: "saveEdit",
-		value: document.getElementById("targetContent").value,
-		dataKey,
+	chrome.storage.sync.get({ dataKey: "data-key" }, function (items) {
+		const dataKey = selector.focusNode.parentNode.getAttribute(
+			items.dataKey || "data-key"
+		);
+		var port = chrome.runtime.connect();
+		port.postMessage({
+			cmd: "saveEdit",
+			value: document.getElementById("targetContent").value,
+			dataKey,
+		});
 	});
 });

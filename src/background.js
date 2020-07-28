@@ -6,6 +6,8 @@ async function translationHandle(content, key) {
 
 	let yamlResult = await translationFromYaml(lang, key);
 
+	console.log("background", yamlResult);
+
 	if (yamlResult) {
 		return yamlResult;
 	} else {
@@ -17,9 +19,8 @@ async function translationHandle(content, key) {
 function translationFromYaml(lang, key) {
 	return new Promise((resolve) => {
 		chrome.storage.local.get({ [lang]: "" }, function (items) {
-			if (items[lang][key]) {
-				resolve(items[lang][key]);
-			}
+			// 如果没有数据的时候也通过resolve 返回，不用 reject，
+			resolve(items[lang][key] || "");
 		});
 	});
 }
@@ -44,6 +45,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 	port.onMessage.addListener(async function (msg) {
 		if (msg.cmd === "selection") {
 			selector = msg.selection;
+			console.log("selector", selector);
 			const result = await translationHandle(
 				selector.text,
 				selector.dataKey

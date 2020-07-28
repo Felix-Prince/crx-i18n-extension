@@ -18,5 +18,10 @@
 			"run_at": "document_end"
 		}
 	],
+	"options_page":"./option/index.html",
+	"options_ui" : {
+		"page" : "./option/index.html" ,
+		"chrome_style" : true
+	  } ,
 	"permissions": ["<all_urls>", "tabs", "storage"]
 }
