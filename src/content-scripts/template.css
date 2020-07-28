@@ -1,7 +1,20 @@
 .crx_extension_hide {
 	display: none;
 }
+
+.crx-extension-icon {
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	font-size: 14px;
+	color: rgb(255, 255, 255);
+	text-align: center;
+	cursor: pointer;
+	background-color: rgb(50, 205, 116);
+}
+
 .Translation_tlContainer__2Jt2_ {
+	position: absolute;
 	width: 300px;
 	border: 1px solid #ccc;
 	border-radius: 10px;
@@ -62,14 +75,14 @@
 }
 
 .Translation_tlContainer__2Jt2_ .anticon {
-  display: inline-block;
-  color: inherit;
-  font-style: normal;
-  line-height: 0;
-  text-align: center;
-  text-transform: none;
-  vertical-align: -0.125em;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	display: inline-block;
+	color: inherit;
+	font-style: normal;
+	line-height: 0;
+	text-align: center;
+	text-transform: none;
+	vertical-align: -0.125em;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }

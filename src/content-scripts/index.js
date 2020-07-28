@@ -1,11 +1,9 @@
-var objImg = new Image();
-objImg.src = "logo192.png";
-objImg.style.display = "none";
-objImg.style.position = "absolute";
-objImg.style.width = "16px";
-objImg.style.height = "16px";
-objImg.style.cursor = "pointer";
-document.body.appendChild(objImg);
+var objIcon = document.createElement("span");
+objIcon.innerText = "译";
+objIcon.style.display = "none";
+objIcon.style.position = "absolute";
+objIcon.classList.add("crx-extension-icon")
+document.body.appendChild(objIcon);
 
 // var selector = null;
 var isShowBox = false;
@@ -13,7 +11,7 @@ var isShowBox = false;
 function createPanel() {
 	let container = document.createElement("div");
 	let template = `
-		<div class="Translation_tlContainer__2Jt2_">
+		<div class="Translation_tlContainer__2Jt2_" id="Translation_tlContainer__2Jt2_">
 			<div class="Translation_tlHeader__29IRr">
 				<h2>翻译</h2>
 				<button type="button" class="ant-btn" id="btnSaveEdit">
@@ -56,17 +54,20 @@ createPanel();
 document.addEventListener("mouseup", function (ev) {
 	ev.stopPropagation();
 	var ev = ev || window.event,
-		left = ev.clientX,
-		top = ev.clientY;
+		left = ev.pageX,
+		top = ev.pageY;
 
 	// 如果有弹框后，在弹框中的选中会影响原先的 data-key ，所以这里在弹框中的选中不执行后续的处理
 	if (isShowBox) return;
 	const selector = window.getSelection();
 	setTimeout(function () {
 		if (selector.toString().length > 0) {
-			objImg.style.display = "block";
-			objImg.style.left = left + "px";
-			objImg.style.top = top + "px";
+			objIcon.style.display = "block";
+			objIcon.style.left = left + "px";
+			objIcon.style.top = top + "px";
+			const tlBox = document.getElementById("Translation_tlContainer__2Jt2_")
+			tlBox.style.left = left + "px";
+			tlBox.style.top = top + "px";
 		}
 	}, 200);
 
@@ -93,7 +94,8 @@ document.addEventListener("mouseup", function (ev) {
 	}
 });
 
-objImg.addEventListener("click", function (e) {
+objIcon.addEventListener("click", function (e) {
+	e.stopPropagation()
 	isShowBox = true;
 	document
 		.getElementById("crx_extension_container")
@@ -108,7 +110,7 @@ document
 
 document.addEventListener("click", function (ev) {
 	if (!window.getSelection().toString()) {
-		objImg.style.display = "none";
+		objIcon.style.display = "none";
 		isShowBox = false;
 		document
 			.getElementById("crx_extension_container")
