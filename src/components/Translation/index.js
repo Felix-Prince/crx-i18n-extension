@@ -9,8 +9,11 @@ import {
 	getStorage,
 	exportFile,
 	clearStorage,
+	goToOptions
 } from "../../popup/index";
 import jsyaml from "js-yaml";
+import locales from "./locales";
+import { debounce } from "lodash";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -20,28 +23,18 @@ export default class Translation extends Component {
 		sourceContent: "",
 		targetContent: "",
 		dataKey: "",
+		toLang: "",
 	};
 
 	componentDidMount() {
 		if (selectedElement() && selectedElement().text) {
-			console.log("selectElement",selectedElement())
+			const { toLang } = this.state;
+			console.log("selectElement", selectedElement());
 			translation(
-				selectedElement().text,
+				{ text: selectedElement().text, to: toLang || "en" },
 				selectedElement().dataKey,
 				(result) => this.handleChange(result, "targetContent")
 			);
-			// getStorage(
-			// 	selectedElement().text,
-			// 	selectedElement().dataKey,
-			// 	this.handleChange,
-			// 	() => {
-			// 		translation(
-			// 			selectedElement().text,
-			// 			selectedElement().dataKey,
-			// 			(result) => this.handleChange(result, "targetContent")
-			// 		);
-			// 	}
-			// );
 			this.setState({
 				sourceContent: selectedElement().text,
 				dataKey: selectedElement().dataKey,
@@ -71,18 +64,40 @@ export default class Translation extends Component {
 		}
 	};
 
+	debounceChange = debounce((value, type) => {
+		const { toLang } = this.state;
+		type === "sourceContent" &&
+			translation(
+				{ text: value, to: toLang || "en" },
+				this.state.dataKey,
+				(result) => this.handleChange(result, "targetContent")
+			);
+	}, 500);
+
 	handleChange = (value, type) => {
 		this.setState({
 			[type]: value,
 		});
-		type === "sourceContent" &&
-			translation(value, this.state.dataKey, (result) =>
-				this.handleChange(result, "targetContent")
-			);
+		this.debounceChange(value, type);
+	};
+
+	changeLang = (value, key) => {
+		this.setState({
+			[key]: value,
+		});
+		const { sourceContent, dataKey } = this.state;
+		translation(
+			{
+				text: sourceContent,
+				to: value,
+			},
+			dataKey,
+			(result) => this.handleChange(result, "targetContent")
+		);
 	};
 
 	render() {
-		const { sourceContent, targetContent } = this.state;
+		const { sourceContent, targetContent, toLang } = this.state;
 
 		const uploadProps = {
 			name: "file",
@@ -112,16 +127,9 @@ export default class Translation extends Component {
 			<div className={styles.tlContainer}>
 				<div className={styles.tlHeader}>
 					<h2>翻译</h2>
-					<Button onClick={() => clearStorage()}>清空缓存</Button>
-					<Button onClick={this.checkImport}>查看导入</Button>
-					{/* <Select defaultValue="lucy" style={{ width: 120 }}>
-                        <Option value="jack">Jack</Option>
-                        <Option value="lucy">Lucy</Option>
-                        <Option value="disabled" disabled>
-                            Disabled
-                        </Option>
-                        <Option value="Yiminghe">yiminghe</Option>
-                    </Select> */}
+					{/* <Button onClick={() => clearStorage()}>清空缓存</Button>
+					<Button onClick={this.checkImport}>查看导入</Button> */}
+					{/* <Button onClick={() => goToOptions()}>设置</Button> */}
 				</div>
 				<div className={styles.tlBody}>
 					<div className={styles.sourceContent}>
@@ -138,12 +146,34 @@ export default class Translation extends Component {
 							}
 						/>
 					</div>
-					<hr />
+					<div className={styles.selectLanguage}>
+						<Select
+							defaultValue={toLang}
+							style={{ width: 280 }}
+							placeholder="目标翻译语言(默认en)"
+							onChange={(value) =>
+								this.changeLang(value, "toLang")
+							}
+						>
+							<Option value="">自动判断</Option>
+							{locales.map((item) => {
+								return (
+									<Option
+										key={item.localeId}
+										value={item.localeId}
+									>
+										{item["zh-CN"]}
+									</Option>
+								);
+							})}
+						</Select>
+					</div>
 					<div className={styles.targetContent}>
 						<TextArea
 							rows={4}
 							id="targetContent"
 							value={targetContent}
+							placeholder="翻译结果"
 							onChange={(e) =>
 								this.handleChange(
 									e.target.value,

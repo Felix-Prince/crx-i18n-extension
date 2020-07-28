@@ -56,3 +56,8 @@ export function exportFile(callback) {
 export function clearStorage() {
 	chrome.storage.local.clear();
 }
+
+
+// export function goToOptions(){
+	// location.href = `chrome://extensions/?options=${chrome.runtime.id}`
+// }

@@ -2,16 +2,28 @@ var selector = null;
 async function translationHandle(content, key) {
 	const { youdao, baidu, google } = window.tjs;
 
-	const lang = await google.detect(content);
+	if (!content.text) return "";
+	let fromLang = await google.detect(content.text);
+	let toLang = content.to;
 
-	let yamlResult = await translationFromYaml(lang, key);
+	// 如果没有设置目标语言，则自动检测
+	if (!toLang) {
+		toLang = fromLang === "zh-CN" ? "en" : "zh-CN";
+	}
+	// 如果源语言和目标语言都是 en 的时候，设置目标语言为中文，因为默认目标语言是 en，所以排除该情况
+	if (fromLang === "en" && toLang === "en") {
+		toLang = "zh-CN";
+		content.to = toLang;
+	}
 
-	console.log("background", yamlResult);
+	let yamlResult = await translationFromYaml(toLang, key);
+
+	console.log("background", toLang);
 
 	if (yamlResult) {
 		return yamlResult;
 	} else {
-		const result = await google.translate(content);
+		const result = await google.translate({ ...content, from: fromLang });
 		return result.result[0];
 	}
 }
@@ -47,7 +59,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 			selector = msg.selection;
 			console.log("selector", selector);
 			const result = await translationHandle(
-				selector.text,
+				{ text: selector.text },
 				selector.dataKey
 			);
 			port.postMessage(result);
