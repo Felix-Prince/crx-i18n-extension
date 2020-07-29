@@ -160,30 +160,28 @@ module.exports = function (webpackEnv) {
 			pathinfo: isEnvDevelopment,
 			// There will be one main bundle, and one file per asynchronous chunk.
 			// In development, it does not produce real files.
-			filename: isEnvProduction
-				? "static/js/[name].[contenthash:8].js"
-				: isEnvDevelopment && "static/js/bundle.js",
+			filename: "static/js/[name].js",
 			// TODO: remove this when upgrading to webpack 5
 			futureEmitAssets: true,
 			// There are also additional JS chunk files if you use code splitting.
-			chunkFilename: isEnvProduction
-				? "static/js/[name].[contenthash:8].chunk.js"
-				: isEnvDevelopment && "static/js/[name].chunk.js",
+			// chunkFilename: isEnvProduction
+			// 	? "static/js/[name].[contenthash:8].chunk.js"
+			// 	: isEnvDevelopment && "static/js/[name].chunk.js",
 			// webpack uses `publicPath` to determine where the app is being served from.
 			// It requires a trailing slash, or the file assets will get an incorrect path.
 			// We inferred the "public path" (such as / or /my-project) from homepage.
 			publicPath: paths.publicUrlOrPath,
 			// Point sourcemap entries to original disk location (format as URL on Windows)
-			devtoolModuleFilenameTemplate: isEnvProduction
-				? (info) =>
-						path
-							.relative(paths.appSrc, info.absoluteResourcePath)
-							.replace(/\\/g, "/")
-				: isEnvDevelopment &&
-				  ((info) =>
-						path
-							.resolve(info.absoluteResourcePath)
-							.replace(/\\/g, "/")),
+			// devtoolModuleFilenameTemplate: isEnvProduction
+			// 	? (info) =>
+			// 			path
+			// 				.relative(paths.appSrc, info.absoluteResourcePath)
+			// 				.replace(/\\/g, "/")
+			// 	: isEnvDevelopment &&
+			// 	  ((info) =>
+			// 			path
+			// 				.resolve(info.absoluteResourcePath)
+			// 				.replace(/\\/g, "/")),
 			// Prevents conflicts when multiple webpack runtimes (from different apps)
 			// are used on the same page.
 			jsonpFunction: `webpackJsonp${appPackageJson.name}`,
@@ -523,57 +521,15 @@ module.exports = function (webpackEnv) {
 		},
 		plugins: [
 			// Generates an `index.html` file with the <script> injected.
-			new HtmlWebpackPlugin(
-				Object.assign(
-					{},
-					{
-						inject: true,
-						template: paths.appHtml,
-					},
-					isEnvProduction
-						? {
-								minify: {
-									removeComments: true,
-									collapseWhitespace: true,
-									removeRedundantAttributes: true,
-									useShortDoctype: true,
-									removeEmptyAttributes: true,
-									removeStyleLinkTypeAttributes: true,
-									keepClosingSlash: true,
-									minifyJS: true,
-									minifyCSS: true,
-									minifyURLs: true,
-								},
-						  }
-						: undefined
-				)
-			),
-			new HtmlWebpackPlugin(
-				Object.assign(
-					{},
-					{
-						inject: true,
-            template: paths.appOptionHtml,
-            filename:'option.html'
-					},
-					isEnvProduction
-						? {
-								minify: {
-									removeComments: true,
-									collapseWhitespace: true,
-									removeRedundantAttributes: true,
-									useShortDoctype: true,
-									removeEmptyAttributes: true,
-									removeStyleLinkTypeAttributes: true,
-									keepClosingSlash: true,
-									minifyJS: true,
-									minifyCSS: true,
-									minifyURLs: true,
-								},
-						  }
-						: undefined
-				)
-			),
+			new HtmlWebpackPlugin({
+				template: paths.appHtml,
+				chunks:["popup"]
+			}),
+			new HtmlWebpackPlugin({
+				template: paths.appOptionHtml,
+				filename: "option/index.html",
+				chunks: ["option"],
+			}),
 			// Inlines the webpack runtime script. This script is too small to warrant
 			// a network request.
 			// https://github.com/facebook/create-react-app/issues/5358

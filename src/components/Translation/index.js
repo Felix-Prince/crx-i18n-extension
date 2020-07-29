@@ -8,8 +8,6 @@ import {
 	setStorage,
 	getStorage,
 	exportFile,
-	clearStorage,
-	goToOptions
 } from "../../popup/index";
 import jsyaml from "js-yaml";
 import locales from "./locales";
@@ -48,12 +46,6 @@ export default class Translation extends Component {
 				type: "application/x-yaml",
 			});
 			saveAs(blob, "file.yaml");
-		});
-	};
-
-	checkImport = () => {
-		exportFile((data) => {
-			console.log("check", data);
 		});
 	};
 
@@ -99,37 +91,26 @@ export default class Translation extends Component {
 	render() {
 		const { sourceContent, targetContent, toLang } = this.state;
 
-		const uploadProps = {
-			name: "file",
-			// action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-			headers: {
-				authorization: "authorization-text",
-			},
-			showUploadList: false,
-			onChange(info) {
-				if (info.file.status !== "uploading") {
-				}
-				if (info.file.status === "done") {
-					let reader = new FileReader();
-					reader.readAsText(info.file.originFileObj, "utf-8");
-					reader.onload = function (e) {
-						var yaml = e.target.result;
-						let jsonData = jsyaml.load(yaml);
-						setStorage("zh-CN", jsonData);
-					};
-				} else if (info.file.status === "error") {
-					console.log(`${info.file.name} file upload failed.`);
-				}
-			},
-		};
-
 		return (
 			<div className={styles.tlContainer}>
 				<div className={styles.tlHeader}>
 					<h2>翻译</h2>
-					{/* <Button onClick={() => clearStorage()}>清空缓存</Button>
-					<Button onClick={this.checkImport}>查看导入</Button> */}
-					{/* <Button onClick={() => goToOptions()}>设置</Button> */}
+					<Select
+						style={{ width: 200 }}
+						placeholder="目标翻译语言(默认en)"
+						onChange={(value) => this.changeLang(value, "toLang")}
+					>
+						{locales.map((item) => {
+							return (
+								<Option
+									key={item.localeId}
+									value={item.localeId}
+								>
+									{item["zh-CN"]}
+								</Option>
+							);
+						})}
+					</Select>
 				</div>
 				<div className={styles.tlBody}>
 					<div className={styles.sourceContent}>
@@ -146,28 +127,7 @@ export default class Translation extends Component {
 							}
 						/>
 					</div>
-					<div className={styles.selectLanguage}>
-						<Select
-							defaultValue={toLang}
-							style={{ width: 280 }}
-							placeholder="目标翻译语言(默认en)"
-							onChange={(value) =>
-								this.changeLang(value, "toLang")
-							}
-						>
-							<Option value="">自动判断</Option>
-							{locales.map((item) => {
-								return (
-									<Option
-										key={item.localeId}
-										value={item.localeId}
-									>
-										{item["zh-CN"]}
-									</Option>
-								);
-							})}
-						</Select>
-					</div>
+					<hr />
 					<div className={styles.targetContent}>
 						<TextArea
 							rows={4}
@@ -181,9 +141,10 @@ export default class Translation extends Component {
 								)
 							}
 						/>
+						{/* 这里还有一个用处， 没有这个 targetContent 的输入会有问题 */}
+						<Input disabled value="导出文件请去扩展选项页" />
 					</div>
-					{/* 这里还有一个用处， 没有这个 targetContent 的输入会有问题 */}
-					<div className={styles.chooseYaml}>
+					{/* <div className={styles.chooseYaml}>
 						<Select
 							size="small"
 							placeholder="请选择导出的语言包"
@@ -192,19 +153,9 @@ export default class Translation extends Component {
 							<Option value="zh-CN">中文</Option>
 							<Option value="en">英文</Option>
 						</Select>
-					</div>
+					</div> */}
 				</div>
 				<div className={styles.tlAction}>
-					<Upload id="importElement" {...uploadProps}>
-						<Button>
-							<Icon type="import" />
-							导入
-						</Button>
-					</Upload>
-					<Button onClick={this.exportYaml}>
-						<Icon type="export" />
-						导出
-					</Button>
 					<Button onClick={this.saveEdit}>
 						<Icon type="save" />
 						保存

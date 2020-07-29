@@ -1,0 +1,5 @@
+.optionHeader,
+.optionBtns {
+	display: flex;
+	justify-content: space-between;
+}

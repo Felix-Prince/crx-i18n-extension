@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Translation from "../components/Translation";
+import "./index.css";
+import EntryManager from './components/EntryManager'
 
-ReactDOM.render(<Translation />, document.getElementById("root"));
+ReactDOM.render(<EntryManager />, document.getElementById("optionRoot"));
