@@ -118,7 +118,7 @@ export default class Translation extends Component {
 							rows={4}
 							id="sourceContent"
 							value={sourceContent}
-							placeholder="输入要翻译的单词或句子"
+							placeholder="中文文案"
 							onChange={(e) =>
 								this.handleChange(
 									e.target.value,
@@ -133,7 +133,7 @@ export default class Translation extends Component {
 							rows={4}
 							id="targetContent"
 							value={targetContent}
-							placeholder="翻译结果"
+							placeholder="目标文案"
 							onChange={(e) =>
 								this.handleChange(
 									e.target.value,

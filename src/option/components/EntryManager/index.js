@@ -15,6 +15,7 @@ import {
 import { getStorage, setStorage, exportFile, clearStorage } from "../../option";
 import jsyaml from "js-yaml";
 import styles from "./index.module.css";
+import locales from "./locales";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -23,19 +24,28 @@ export default class EntryManager extends React.Component {
 	state = {
 		data: [],
 		visible: false,
+		importVisible: false,
 		field: "",
 		entry: "",
 		selectFile: "",
 		fileList: [],
+		importFileList: [],
+		filteLanguage: "zh-CN",
+		importLanguage: "",
 	};
 
 	componentDidMount() {
-		getStorage("fileList", (items) => {
+		// 初始默认获取中文包
+		this.getFileList("zh-CN", "fileList");
+	}
+
+	getFileList = (lang) => {
+		getStorage(lang, (items) => {
 			this.setState({
-				fileList: items || [],
+				fileList: items.fileList || [],
 			});
 		});
-	}
+	};
 
 	columns = [
 		{
@@ -67,10 +77,11 @@ export default class EntryManager extends React.Component {
 	];
 
 	handleSearch = (value) => {
+		const { filteLanguage, selectFile } = this.state;
 		if (!value) {
-			getStorage("", "", (items) => {
+			getStorage(filteLanguage, (items) => {
 				this.setState({
-					data: items,
+					data: items[selectFile],
 				});
 			});
 		} else {
@@ -82,6 +93,7 @@ export default class EntryManager extends React.Component {
 	};
 
 	handleChange = (e, record) => {
+		const { filteLanguage, fileList, selectFile } = this.state;
 		let data = [...this.state.data];
 		this.editData(data, record, e.target.value);
 		console.log("data", data);
@@ -89,16 +101,17 @@ export default class EntryManager extends React.Component {
 			data,
 		});
 
-		setStorage("zh-CN", data);
+		setStorage(filteLanguage, { [selectFile]: data, fileList });
 	};
 
 	handleDelete = (record) => {
+		const { filteLanguage, fileList, selectFile } = this.state;
 		const data = this.deleteData(this.state.data, record);
 		console.log("data", data);
 		this.setState({
 			data,
 		});
-		setStorage("zh-CN", data);
+		setStorage(filteLanguage, { [selectFile]: data, fileList });
 	};
 
 	editData = (data, record, value) => {
@@ -145,11 +158,12 @@ export default class EntryManager extends React.Component {
 	};
 
 	exportYaml = () => {
-		if (!this.state.selectFile) {
+		const { selectFile, filteLanguage } = this.state;
+		if (!selectFile) {
 			message.info("请选择要导出的文件");
 		}
-		exportFile((data) => {
-			const blob = new Blob([jsyaml.dump(data["zh-CN"])], {
+		exportFile(filteLanguage, selectFile, (data) => {
+			const blob = new Blob([jsyaml.dump(data)], {
 				type: "application/x-yaml",
 			});
 			saveAs(blob, this.state.selectFile);
@@ -163,7 +177,14 @@ export default class EntryManager extends React.Component {
 	};
 
 	handleOk = (e) => {
-		const { data, field, entry } = this.state;
+		const {
+			data,
+			field,
+			entry,
+			filteLanguage,
+			fileList,
+			selectFile,
+		} = this.state;
 		const newData = [...data];
 		const obj = {
 			key: field,
@@ -175,7 +196,7 @@ export default class EntryManager extends React.Component {
 			data: newData,
 		});
 
-		setStorage("zh-CN", newData);
+		setStorage(filteLanguage, { [selectFile]: data, fileList });
 	};
 
 	handleCancel = (e) => {
@@ -185,16 +206,41 @@ export default class EntryManager extends React.Component {
 	};
 
 	changeFile = (value) => {
-		getStorage(value, (items) => {
+		const { filteLanguage } = this.state;
+		getStorage(filteLanguage, (items) => {
 			this.setState({
-				data: items,
+				data: items[value],
 				selectFile: value,
 			});
 		});
 	};
 
+	handleImportLanguage = (lang) => {
+		this.setState({
+			importLanguage: lang,
+		});
+		this.getFileList(lang, "importFileList");
+	};
+
+	handleFilterLang = (lang) => {
+		this.setState({
+			filteLanguage: lang,
+		});
+		this.getFileList(lang, "fileList");
+	};
+
 	render() {
-		const { data, visible, field, entry, fileList } = this.state;
+		const {
+			data,
+			visible,
+			importVisible,
+			field,
+			entry,
+			fileList,
+			importLanguage,
+			filteLanguage,
+			importFileList,
+		} = this.state;
 
 		console.log("fileList", fileList);
 
@@ -205,6 +251,9 @@ export default class EntryManager extends React.Component {
 				authorization: "authorization-text",
 			},
 			showUploadList: false,
+			beforeUpload() {
+				return !!importLanguage;
+			},
 			onChange(info) {
 				if (info.file.status !== "uploading") {
 				}
@@ -214,8 +263,16 @@ export default class EntryManager extends React.Component {
 					reader.onload = function (e) {
 						var yaml = e.target.result;
 						let jsonData = jsyaml.load(yaml);
-						setStorage(info.file.name, jsonData);
-						setStorage("fileList", [...fileList, info.file.name]);
+						setStorage(
+							importLanguage,
+							{
+								[info.file.name]: jsonData,
+								fileList: [...importFileList, info.file.name],
+							},
+							"import"
+						);
+						// setStorage(info.file.name, jsonData);
+						// setStorage("fileList", [...fileList, info.file.name]);
 						window.history.go(0);
 					};
 				} else if (info.file.status === "error") {
@@ -228,6 +285,24 @@ export default class EntryManager extends React.Component {
 			<div>
 				<div className={styles.optionHeader}>
 					<div>
+						请选择语言：
+						<Select
+							defaultValue={filteLanguage}
+							style={{ width: 300 }}
+							placeholder="请选择导入文件的语言"
+							onChange={(value) => this.handleFilterLang(value)}
+						>
+							{locales.map((item) => {
+								return (
+									<Option
+										key={item.localeId}
+										value={item.localeId}
+									>
+										{item["zh-CN"]}
+									</Option>
+								);
+							})}
+						</Select>
 						请选择 yaml 文件：
 						<Select
 							style={{ width: 300 }}
@@ -248,12 +323,15 @@ export default class EntryManager extends React.Component {
 						style={{ width: 300 }}
 					/>
 					<div className={styles.optionBtns}>
-						<Upload id="importElement" {...uploadProps}>
-							<Button>
-								<Icon type="import" />
-								导入
-							</Button>
-						</Upload>
+						<Button
+							onClick={() =>
+								this.setState({ importVisible: true })
+							}
+						>
+							<Icon type="import" />
+							导入
+						</Button>
+
 						<Button onClick={this.exportYaml}>
 							<Icon type="export" />
 							导出
@@ -292,6 +370,34 @@ export default class EntryManager extends React.Component {
 								this.setState({ entry: e.target.value })
 							}
 						/>
+					</Form.Item>
+				</Modal>
+				<Modal title="导入文件" visible={importVisible} footer={null}>
+					<Form.Item label="选择语言">
+						<Select
+							defaultValue={importLanguage}
+							style={{ width: 300 }}
+							placeholder="请选择导入文件的语言"
+							onChange={(value) =>
+								this.handleImportLanguage(value)
+							}
+						>
+							{locales.map((item) => {
+								return (
+									<Option
+										key={item.localeId}
+										value={item.localeId}
+									>
+										{item["zh-CN"]}
+									</Option>
+								);
+							})}
+						</Select>
+					</Form.Item>
+					<Form.Item label="选择文件">
+						<Upload id="importElement" {...uploadProps}>
+							<Button>导入</Button>
+						</Upload>
 					</Form.Item>
 				</Modal>
 			</div>

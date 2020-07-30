@@ -5,18 +5,38 @@ console.log("background", background);
 
 export function getStorage(key, callback) {
 	chrome.storage.local.get({ [key]: "" }, function (items) {
-		console.log("items", items);
-		callback &&
-			callback(key === "fileList" ? items[key] : Json2Array(items[key]));
+		const temp = items[key];
+		console.log("items", temp);
+		const res = {};
+		for (const k in temp) {
+			if (k === "fileList") {
+				res[k] = temp[k];
+			} else {
+				res[k] = Json2Array(temp[k]);
+			}
+		}
+		console.log("result", res);
+		callback && callback(res);
 	});
 }
 
-export function setStorage(key, data) {
-	let newData = data;
-	if (Array.isArray(data) && key !== "fileList") {
-		console.log("array", Array2Json(data));
-		newData = Array2Json(data);
+export function setStorage(key, data, type = "edit") {
+	console.log("setStorage", data);
+	let newData = {};
+
+	if (type === "import") {
+		newData = data;
+	} else {
+		for (const k in data) {
+			if (k === "fileList") {
+				newData[k] = data[k];
+			} else {
+				newData[k] = Array2Json(data[k]);
+			}
+		}
 	}
+
+	console.log("array", newData);
 	chrome.storage.local.set({ [key]: newData }, function () {
 		console.log("保存成功！");
 		chrome.storage.local.get((items) => {
@@ -83,8 +103,10 @@ function restore_options() {
 
 // document.addEventListener("DOMContentLoaded", restore_options);
 
-export function exportFile(callback) {
-	chrome.storage.local.get(callback);
+export function exportFile(lang, filename, callback) {
+	chrome.storage.local.get({ [lang]: "" }, (items) => {
+		callback && callback(items[lang][filename]);
+	});
 }
 
 export function clearStorage() {
