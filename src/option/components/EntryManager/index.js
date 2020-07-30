@@ -12,7 +12,13 @@ import {
 	Icon,
 	message,
 } from "antd";
-import { getStorage, setStorage, exportFile, clearStorage } from "../../option";
+import {
+	getStorage,
+	setStorage,
+	exportFile,
+	clearStorage,
+	checkStorage,
+} from "../../option";
 import jsyaml from "js-yaml";
 import styles from "./index.module.css";
 import locales from "./locales";
@@ -171,7 +177,7 @@ export default class EntryManager extends React.Component {
 	};
 
 	checkImport = () => {
-		exportFile((data) => {
+		checkStorage((data) => {
 			console.log("check", data);
 		});
 	};
@@ -288,7 +294,7 @@ export default class EntryManager extends React.Component {
 						请选择语言：
 						<Select
 							defaultValue={filteLanguage}
-							style={{ width: 300 }}
+							style={{ width: 120 }}
 							placeholder="请选择导入文件的语言"
 							onChange={(value) => this.handleFilterLang(value)}
 						>
@@ -305,7 +311,7 @@ export default class EntryManager extends React.Component {
 						</Select>
 						请选择 yaml 文件：
 						<Select
-							style={{ width: 300 }}
+							style={{ width: 250 }}
 							placeholder="请选择文件"
 							onChange={this.changeFile}
 						>

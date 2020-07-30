@@ -13,6 +13,11 @@
 	background-color: rgb(50, 205, 116);
 }
 
+#state {
+	font-size: 14px;
+	color: orangered;
+}
+
 .Translation_tlContainer__2Jt2_ {
 	position: absolute;
 	width: 300px;

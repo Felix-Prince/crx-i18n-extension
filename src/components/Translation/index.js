@@ -1,13 +1,12 @@
 /*global saveAs*/
 import React, { Component } from "react";
 import styles from "./index.module.css";
-import { Select, Input, Button, Icon, Upload } from "antd";
+import { Select, Input, Button, Icon, Upload, message } from "antd";
 import {
 	translation,
 	selectedElement,
 	setStorage,
 	getStorage,
-	exportFile,
 } from "../../popup/index";
 import jsyaml from "js-yaml";
 import locales from "./locales";
@@ -21,7 +20,7 @@ export default class Translation extends Component {
 		sourceContent: "",
 		targetContent: "",
 		dataKey: "",
-		toLang: "",
+		toLang: "en",
 	};
 
 	componentDidMount() {
@@ -29,9 +28,15 @@ export default class Translation extends Component {
 			const { toLang } = this.state;
 			console.log("selectElement", selectedElement());
 			translation(
-				{ text: selectedElement().text, to: toLang || "en" },
+				{ text: selectedElement().text, to: toLang },
 				selectedElement().dataKey,
-				(result) => this.handleChange(result, "targetContent")
+				(result) => {
+					this.setState({
+						targetContent: result.value,
+						filename: result.filename,
+					});
+					// this.handleChange(result, "targetContent")
+				}
 			);
 			this.setState({
 				sourceContent: selectedElement().text,
@@ -40,19 +45,14 @@ export default class Translation extends Component {
 		}
 	}
 
-	exportYaml = () => {
-		exportFile((data) => {
-			const blob = new Blob([jsyaml.dump(data["zh-CN"])], {
-				type: "application/x-yaml",
-			});
-			saveAs(blob, "file.yaml");
-		});
-	};
-
 	saveEdit = () => {
-		const { targetContent, dataKey } = this.state;
+		const { targetContent, dataKey, toLang, filename } = this.state;
+		if (!filename) {
+			message.info("翻译来自 google ，请去选项配置页面增加相应词条！");
+		}
 		if (dataKey) {
-			setStorage("zh-CN", { [dataKey]: targetContent });
+			setStorage(toLang, filename, { [dataKey]: targetContent });
+			message.info("词条修改成功！")
 		}
 	};
 
@@ -60,7 +60,7 @@ export default class Translation extends Component {
 		const { toLang } = this.state;
 		type === "sourceContent" &&
 			translation(
-				{ text: value, to: toLang || "en" },
+				{ text: value, to: toLang },
 				this.state.dataKey,
 				(result) => this.handleChange(result, "targetContent")
 			);
@@ -89,7 +89,7 @@ export default class Translation extends Component {
 	};
 
 	render() {
-		const { sourceContent, targetContent, toLang } = this.state;
+		const { sourceContent, targetContent, filename } = this.state;
 
 		return (
 			<div className={styles.tlContainer}>
@@ -142,7 +142,12 @@ export default class Translation extends Component {
 							}
 						/>
 						{/* 这里还有一个用处， 没有这个 targetContent 的输入会有问题 */}
-						<Input disabled value="导出文件请去扩展选项页" />
+						<Input
+							disabled
+							value={`词条文案来自 ${
+								filename ? filename + " 文件" : "google 翻译"
+							}`}
+						/>
 					</div>
 					{/* <div className={styles.chooseYaml}>
 						<Select

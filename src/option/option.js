@@ -109,6 +109,10 @@ export function exportFile(lang, filename, callback) {
 	});
 }
 
+export function checkStorage(callback){
+	chrome.storage.local.get(callback);
+}
+
 export function clearStorage() {
 	chrome.storage.local.clear();
 }
