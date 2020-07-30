@@ -12,16 +12,11 @@ import {
 	Icon,
 	message,
 } from "antd";
-import {
-	getStorage,
-	setStorage,
-	exportFile,
-	clearStorage,
-	checkStorage,
-} from "../../option";
+import { getStorage, setStorage, exportFile } from "../../option";
 import jsyaml from "js-yaml";
 import styles from "./index.module.css";
 import locales from "./locales";
+import { clearStorage, checkStorage } from "../../../utils";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -378,7 +373,13 @@ export default class EntryManager extends React.Component {
 						/>
 					</Form.Item>
 				</Modal>
-				<Modal title="导入文件" visible={importVisible} footer={null}>
+				<Modal
+					title="导入文件"
+					visible={importVisible}
+					footer={null}
+					closable={true}
+					onCancel={() => this.setState({ importVisible: false })}
+				>
 					<Form.Item label="选择语言">
 						<Select
 							defaultValue={importLanguage}

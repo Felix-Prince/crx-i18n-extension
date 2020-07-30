@@ -19,19 +19,6 @@ export function selectedElement() {
 
 export function setStorage(lang, filename, data) {
 	background.setStorage(lang, filename, data);
-	// chrome.storage.local.get({ [lang]: "" }, (items) => {
-	// 	const allData = items[lang];
-	// 	console.log("alldata", items[lang]);
-	// 	chrome.storage.local.set(
-	// 		{ "zh-CN": _.merge(allData, data) },
-	// 		function () {
-	// 			console.log("保存成功！");
-	// 			chrome.storage.local.get((items) => {
-	// 				console.log("setSroage", items);
-	// 			});
-	// 		}
-	// 	);
-	// });
 }
 
 export function getStorage(text, key, SuccessCallback, FailCallback) {
@@ -48,15 +35,3 @@ export function getStorage(text, key, SuccessCallback, FailCallback) {
 		});
 	});
 }
-
-export function exportFile(callback) {
-	chrome.storage.local.get(callback);
-}
-
-export function clearStorage() {
-	chrome.storage.local.clear();
-}
-
-// export function goToOptions(){
-// location.href = `chrome://extensions/?options=${chrome.runtime.id}`
-// }

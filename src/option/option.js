@@ -1,4 +1,5 @@
 /*global chrome*/
+import { Json2Array, Array2Json } from "../utils";
 const background = chrome.extension.getBackgroundPage();
 
 console.log("background", background);
@@ -45,37 +46,6 @@ export function setStorage(key, data, type = "edit") {
 	});
 }
 
-function Json2Array(object) {
-	let data = [];
-	for (const key in object) {
-		const obj = {};
-		if (typeof object[key] === "string") {
-			obj.key = key;
-			obj.entry = object[key];
-			data.push(obj);
-		}
-		if (typeof object[key] === "object") {
-			obj.key = key;
-			obj.children = Json2Array(object[key]);
-			data.push(obj);
-			// data = [...data, ...Json2Array(object[key], key)];
-		}
-	}
-	return data;
-}
-
-function Array2Json(array) {
-	const obj = {};
-	array.forEach((item) => {
-		if (item.children) {
-			obj[item.key] = Array2Json(item.children);
-		} else {
-			obj[item.key] = item.entry;
-		}
-	});
-	return obj;
-}
-
 function save_options(e) {
 	chrome.storage.sync.set(
 		{
@@ -107,12 +77,4 @@ export function exportFile(lang, filename, callback) {
 	chrome.storage.local.get({ [lang]: "" }, (items) => {
 		callback && callback(items[lang][filename]);
 	});
-}
-
-export function checkStorage(callback){
-	chrome.storage.local.get(callback);
-}
-
-export function clearStorage() {
-	chrome.storage.local.clear();
 }

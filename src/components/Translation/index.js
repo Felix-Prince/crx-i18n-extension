@@ -1,14 +1,12 @@
 /*global saveAs*/
 import React, { Component } from "react";
 import styles from "./index.module.css";
-import { Select, Input, Button, Icon, Upload, message } from "antd";
+import { Select, Input, Button, Icon, message } from "antd";
 import {
 	translation,
 	selectedElement,
 	setStorage,
-	getStorage,
 } from "../../popup/index";
-import jsyaml from "js-yaml";
 import locales from "./locales";
 import { debounce } from "lodash";
 
