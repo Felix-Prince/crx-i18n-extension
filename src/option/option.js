@@ -1,5 +1,6 @@
 /*global chrome*/
 import { Json2Array, Array2Json } from "../utils";
+import _ from "lodash";
 const background = chrome.extension.getBackgroundPage();
 
 console.log("background", background);
@@ -22,7 +23,6 @@ export function getStorage(key, callback) {
 }
 
 export function setStorage(key, data, type = "edit") {
-	console.log("setStorage", data);
 	let newData = {};
 
 	if (type === "import") {
@@ -38,11 +38,32 @@ export function setStorage(key, data, type = "edit") {
 	}
 
 	console.log("array", newData);
-	chrome.storage.local.set({ [key]: newData }, function () {
-		console.log("保存成功！");
-		chrome.storage.local.get((items) => {
-			console.log("setSroage", items);
-		});
+	chrome.storage.local.get({ [key]: "" }, function (items) {
+		let params = {};
+		if (!_.isEmpty(items) && !_.isEmpty(items[key])) {
+			params = {
+				...items[key],
+				...newData,
+				fileList: Array.from(
+					new Set([...items[key].fileList, ...newData.fileList])
+				),
+			};
+		} else {
+			params = {
+				...newData,
+			};
+		}
+		chrome.storage.local.set(
+			{
+				[key]: params,
+			},
+			function () {
+				console.log("保存成功！");
+				chrome.storage.local.get((items) => {
+					console.log("setSroage", items);
+				});
+			}
+		);
 	});
 }
 

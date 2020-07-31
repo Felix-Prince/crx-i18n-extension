@@ -11,6 +11,7 @@ import {
 	Upload,
 	Icon,
 	message,
+	Divider,
 } from "antd";
 import { getStorage, setStorage, exportFile } from "../../option";
 import jsyaml from "js-yaml";
@@ -26,8 +27,10 @@ export default class EntryManager extends React.Component {
 		data: [],
 		visible: false,
 		importVisible: false,
+		tsVisible: false,
 		field: "",
 		entry: "",
+		newEntry: "",
 		selectFile: "",
 		fileList: [],
 		importFileList: [],
@@ -71,6 +74,8 @@ export default class EntryManager extends React.Component {
 			key: "action",
 			render: (text, record) => (
 				<span>
+					<a onClick={() => this.handleTranslate(record)}>翻译</a>
+					<Divider type="vertical" />
 					<a onClick={() => this.handleDelete(record)}>删除</a>
 				</span>
 			),
@@ -226,8 +231,34 @@ export default class EntryManager extends React.Component {
 	handleFilterLang = (lang) => {
 		this.setState({
 			filteLanguage: lang,
+			selectFile: "",
 		});
 		this.getFileList(lang, "fileList");
+	};
+
+	handleTranslate = (record) => {
+		this.setState({
+			tsVisible: true,
+			field: record.key,
+			entry: record.entry,
+		});
+	};
+
+	handleTranslateOk = () => {
+		const { importLanguage, field, newEntry, selectFile } = this.state;
+		setStorage(
+			importLanguage,
+			{
+				[selectFile]: { [field]: newEntry },
+				fileList: [selectFile],
+			},
+			"import"
+		);
+
+		this.setState({
+			tsVisible: false,
+			importLanguage: "",
+		});
 	};
 
 	render() {
@@ -238,9 +269,12 @@ export default class EntryManager extends React.Component {
 			field,
 			entry,
 			fileList,
+			selectFile,
 			importLanguage,
 			filteLanguage,
 			importFileList,
+			newEntry,
+			tsVisible,
 		} = this.state;
 
 		console.log("fileList", fileList);
@@ -309,6 +343,7 @@ export default class EntryManager extends React.Component {
 							style={{ width: 250 }}
 							placeholder="请选择文件"
 							onChange={this.changeFile}
+							value={selectFile}
 						>
 							{fileList.map((item) => (
 								<Option value={item} key={item}>
@@ -326,7 +361,9 @@ export default class EntryManager extends React.Component {
 					<div className={styles.optionBtns}>
 						<Button
 							onClick={() =>
-								this.setState({ importVisible: true })
+								this.setState({
+									importVisible: true,
+								})
 							}
 						>
 							<Icon type="import" />
@@ -378,12 +415,17 @@ export default class EntryManager extends React.Component {
 					visible={importVisible}
 					footer={null}
 					closable={true}
-					onCancel={() => this.setState({ importVisible: false })}
+					onCancel={() =>
+						this.setState({
+							importVisible: false,
+							importLanguage: "",
+						})
+					}
 				>
 					<Form.Item label="选择语言">
 						<Select
 							defaultValue={importLanguage}
-							style={{ width: 300 }}
+							style={{ width: "100%" }}
 							placeholder="请选择导入文件的语言"
 							onChange={(value) =>
 								this.handleImportLanguage(value)
@@ -401,11 +443,66 @@ export default class EntryManager extends React.Component {
 							})}
 						</Select>
 					</Form.Item>
-					<Form.Item label="选择文件">
-						<Upload id="importElement" {...uploadProps}>
-							<Button>导入</Button>
-						</Upload>
+					{importLanguage && (
+						<Form.Item label="选择文件">
+							<Upload id="importElement" {...uploadProps}>
+								<Button>导入</Button>
+							</Upload>
+						</Form.Item>
+					)}
+				</Modal>
+				<Modal
+					title="翻译文案"
+					visible={tsVisible}
+					closable={true}
+					onCancel={() =>
+						this.setState({
+							tsVisible: false,
+							importLanguage: "",
+							newEntry: "",
+						})
+					}
+					onOk={this.handleTranslateOk}
+				>
+					<Form.Item label="选择语言">
+						<Select
+							defaultValue={importLanguage}
+							style={{ width: "100%" }}
+							placeholder="请选择导入文件的语言"
+							onChange={(value) =>
+								this.handleImportLanguage(value)
+							}
+						>
+							{locales.map((item) => {
+								return (
+									<Option
+										key={item.localeId}
+										value={item.localeId}
+									>
+										{item["zh-CN"]}
+									</Option>
+								);
+							})}
+						</Select>
 					</Form.Item>
+					{importLanguage && (
+						<>
+							<Form.Item label="原文案">
+								<Input value={entry} disabled />
+							</Form.Item>
+							<Form.Item label="翻译文案">
+								<Input
+									placeholder="请输入你的翻译结果"
+									value={newEntry}
+									onChange={(e) =>
+										this.setState({
+											newEntry: e.target.value,
+										})
+									}
+								/>
+							</Form.Item>
+						</>
+					)}
 				</Modal>
 			</div>
 		);
